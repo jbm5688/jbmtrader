@@ -1,0 +1,40 @@
+========================================
+COMO EXTRAIR O JBMTRADER PARA C:\JBMROBO\
+========================================
+
+PASSO 1: Baixar os arquivos
+- Copie este nome: jbmtrader.rar
+- Baixe o arquivo para seu computador
+
+PASSO 2: Criar a pasta
+- Abra o Windows Explorer
+- Digite na barra de endereço: c:\
+- Clique direito na tela branca
+- Escolha "Nova pasta"
+- Digite o nome: JBMROBO
+
+PASSO 3: Extrair o arquivo
+- Clique direito no arquivo jbmtrader.rar
+- Escolha "Extrair aqui" ou "Extract here"
+- OU se tiver WinRAR: "Extrair para jbmtrader\"
+
+PASSO 4: Mover para C:\JBMROBO\
+- Selecione todos os arquivos extraídos
+- Copie (Ctrl+C)
+- Vá para C:\JBMROBO\
+- Cole (Ctrl+V)
+
+PRONTO! Seu JBM Trader estará em C:\JBMROBO\
+
+========================================
+EXECUTAR O TRADING BOT
+========================================
+
+Dentro da pasta C:\JBMROBO\ você encontrará:
+- iniciar-trading-bot.bat (clique duas vezes neste)
+
+Ou se preferir:
+- main.js (arquivo principal)
+- LEIA-ME.txt (instruções detalhadas)
+
+========================================

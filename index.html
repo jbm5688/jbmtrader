@@ -1,0 +1,134 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>JBM Trader - Sistema de Trading Automatizado</title>
+    <link rel="icon" type="image/svg+xml" href="/vite.svg" />
+    <style>
+        body {
+            margin: 0;
+            padding: 0;
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        .container {
+            background: white;
+            border-radius: 12px;
+            padding: 40px;
+            text-align: center;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.1);
+            max-width: 500px;
+            width: 90%;
+        }
+        .logo {
+            font-size: 2.5rem;
+            font-weight: bold;
+            color: #667eea;
+            margin-bottom: 20px;
+        }
+        .subtitle {
+            color: #666;
+            margin-bottom: 30px;
+            font-size: 1.1rem;
+        }
+        .features {
+            text-align: left;
+            margin: 30px 0;
+        }
+        .feature {
+            margin: 10px 0;
+            padding: 10px;
+            background: #f8f9fa;
+            border-radius: 6px;
+            border-left: 4px solid #667eea;
+        }
+        .btn {
+            background: #667eea;
+            color: white;
+            border: none;
+            padding: 15px 30px;
+            border-radius: 8px;
+            font-size: 1.1rem;
+            cursor: pointer;
+            text-decoration: none;
+            display: inline-block;
+            margin: 10px;
+            transition: all 0.3s ease;
+        }
+        .btn:hover {
+            background: #5a6fd8;
+            transform: translateY(-2px);
+        }
+        .status {
+            margin-top: 20px;
+            padding: 10px;
+            border-radius: 6px;
+            background: #e8f5e8;
+            color: #2d5f2d;
+            font-weight: bold;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="logo">JBM TRADER</div>
+        <div class="subtitle">Sistema Profissional de Trading Automatizado</div>
+        
+        <div class="features">
+            <div class="feature">
+                <strong>3 Brokers Integrados:</strong> IQ Option, Quotex, Avalon
+            </div>
+            <div class="feature">
+                <strong>Análise Técnica Avançada:</strong> Médias móveis, RSI, MACD
+            </div>
+            <div class="feature">
+                <strong>Trading Automatizado:</strong> Estratégias programadas
+            </div>
+            <div class="feature">
+                <strong>Gestão de Risco:</strong> Stop loss e take profit automáticos
+            </div>
+            <div class="feature">
+                <strong>Interface Moderna:</strong> Dashboard em tempo real
+            </div>
+        </div>
+
+        <a href="/app" class="btn">Iniciar Trading</a>
+        <a href="/config" class="btn">Configurações</a>
+        
+        <div class="status" id="status">
+            Sistema Carregando...
+        </div>
+    </div>
+
+    <script>
+        // Verificar status do servidor
+        fetch('/api/health')
+            .then(response => {
+                if (response.ok) {
+                    document.getElementById('status').innerHTML = '✅ Sistema Online e Funcionando';
+                    document.getElementById('status').style.background = '#e8f5e8';
+                } else {
+                    throw new Error('Servidor não respondeu');
+                }
+            })
+            .catch(() => {
+                document.getElementById('status').innerHTML = '⚠️ Iniciando servidor...';
+                document.getElementById('status').style.background = '#fff3cd';
+                // Redirecionar para a aplicação principal após alguns segundos
+                setTimeout(() => {
+                    window.location.href = '/app';
+                }, 3000);
+            });
+
+        // Auto-redirecionar para a aplicação após 5 segundos se estiver online
+        setTimeout(() => {
+            window.location.href = '/app';
+        }, 5000);
+    </script>
+</body>
+</html>

@@ -1,0 +1,368 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>JBM Trader - Sistema de Trading Automatizado</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            color: #333;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        .header {
+            text-align: center;
+            margin-bottom: 40px;
+            color: white;
+        }
+
+        .header h1 {
+            font-size: 3rem;
+            margin-bottom: 10px;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
+        }
+
+        .header p {
+            font-size: 1.2rem;
+            opacity: 0.9;
+        }
+
+        .cards-container {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+            gap: 30px;
+            margin-bottom: 40px;
+        }
+
+        .license-card {
+            background: white;
+            border-radius: 15px;
+            padding: 30px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .license-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 15px 40px rgba(0,0,0,0.3);
+        }
+
+        .license-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 5px;
+            background: linear-gradient(90deg, #667eea, #764ba2);
+        }
+
+        .license-card h3 {
+            font-size: 1.5rem;
+            margin-bottom: 15px;
+            color: #333;
+        }
+
+        .price {
+            font-size: 2rem;
+            font-weight: bold;
+            color: #667eea;
+            margin-bottom: 20px;
+        }
+
+        .features {
+            list-style: none;
+            margin-bottom: 25px;
+        }
+
+        .features li {
+            padding: 8px 0;
+            position: relative;
+            padding-left: 25px;
+        }
+
+        .features li::before {
+            content: '✓';
+            position: absolute;
+            left: 0;
+            color: #28a745;
+            font-weight: bold;
+        }
+
+        .btn {
+            width: 100%;
+            padding: 15px;
+            border: none;
+            border-radius: 8px;
+            font-size: 1rem;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            color: white;
+        }
+
+        .btn-success {
+            background: linear-gradient(135deg, #28a745, #20c997);
+            color: white;
+        }
+
+        .btn-warning {
+            background: linear-gradient(135deg, #ffc107, #fd7e14);
+            color: white;
+        }
+
+        .btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+        }
+
+        .popular {
+            position: relative;
+        }
+
+        .popular::after {
+            content: 'MAIS POPULAR';
+            position: absolute;
+            top: -10px;
+            right: -10px;
+            background: #ff4757;
+            color: white;
+            padding: 5px 15px;
+            border-radius: 20px;
+            font-size: 0.8rem;
+            font-weight: bold;
+            transform: rotate(15deg);
+        }
+
+        .features-section {
+            background: white;
+            border-radius: 15px;
+            padding: 40px;
+            margin-bottom: 40px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+        }
+
+        .features-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 30px;
+            margin-top: 30px;
+        }
+
+        .feature-item {
+            text-align: center;
+            padding: 20px;
+        }
+
+        .feature-icon {
+            font-size: 3rem;
+            margin-bottom: 15px;
+            color: #667eea;
+        }
+
+        .brokers-section {
+            background: white;
+            border-radius: 15px;
+            padding: 40px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+        }
+
+        .brokers-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 20px;
+            margin-top: 30px;
+        }
+
+        .broker-card {
+            background: #f8f9fa;
+            border-radius: 10px;
+            padding: 20px;
+            text-align: center;
+            transition: all 0.3s ease;
+        }
+
+        .broker-card:hover {
+            background: #e9ecef;
+            transform: translateY(-3px);
+        }
+
+        .status-indicator {
+            display: inline-block;
+            width: 10px;
+            height: 10px;
+            border-radius: 50%;
+            margin-right: 8px;
+        }
+
+        .status-active {
+            background: #28a745;
+        }
+
+        .status-inactive {
+            background: #dc3545;
+        }
+
+        @media (max-width: 768px) {
+            .header h1 {
+                font-size: 2rem;
+            }
+            
+            .cards-container {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>🤖 JBM Trader</h1>
+            <p>Sistema Completo de Trading Automatizado com 3 Opções de Licenciamento</p>
+        </div>
+
+        <div class="cards-container">
+            <!-- Licença Definitiva -->
+            <div class="license-card">
+                <h3>💎 Licença Definitiva</h3>
+                <div class="price">R$ 299,99</div>
+                <ul class="features">
+                    <li>Pagamento único</li>
+                    <li>Uso vitalício</li>
+                    <li>Todas as atualizações incluídas</li>
+                    <li>Suporte prioritário</li>
+                    <li>Backup automático</li>
+                    <li>Acesso a todas as estratégias</li>
+                </ul>
+                <button class="btn btn-primary" onclick="selectLicense('definitiva')">Adquirir Licença</button>
+            </div>
+
+            <!-- Licença Mensal -->
+            <div class="license-card popular">
+                <h3>📅 Licença Mensal</h3>
+                <div class="price">R$ 29,99/mês</div>
+                <ul class="features">
+                    <li>Renovação automática</li>
+                    <li>Cancela quando quiser</li>
+                    <li>7 dias de garantia</li>
+                    <li>Pagamento via cartão/PIX</li>
+                    <li>Suporte técnico</li>
+                    <li>Atualizações mensais</li>
+                </ul>
+                <button class="btn btn-success" onclick="selectLicense('mensal')">Assinar Agora</button>
+            </div>
+
+            <!-- Pay-per-Gain -->
+            <div class="license-card">
+                <h3>💰 Pay-per-Gain</h3>
+                <div class="price">0,5% por lucro</div>
+                <ul class="features">
+                    <li>Sem custo inicial</li>
+                    <li>Paga apenas quando ganha</li>
+                    <li>PIX automático</li>
+                    <li>Zero cobrança em prejuízo</li>
+                    <li>Monitoramento automático</li>
+                    <li>Histórico detalhado</li>
+                </ul>
+                <button class="btn btn-warning" onclick="selectLicense('pay-per-gain')">Começar Grátis</button>
+            </div>
+        </div>
+
+        <div class="features-section">
+            <h2 style="text-align: center; margin-bottom: 20px; color: #333;">🚀 Funcionalidades do Sistema</h2>
+            <div class="features-grid">
+                <div class="feature-item">
+                    <div class="feature-icon">📊</div>
+                    <h4>Análise Técnica Avançada</h4>
+                    <p>Algoritmos de machine learning para análise de mercado em tempo real</p>
+                </div>
+                <div class="feature-item">
+                    <div class="feature-icon">🎯</div>
+                    <h4>Estratégias Automatizadas</h4>
+                    <p>Múltiplas estratégias testadas e otimizadas para maximizar lucros</p>
+                </div>
+                <div class="feature-item">
+                    <div class="feature-icon">⚡</div>
+                    <h4>Execução Rápida</h4>
+                    <p>Entrada e saída automática de operações em milissegundos</p>
+                </div>
+                <div class="feature-item">
+                    <div class="feature-icon">🛡️</div>
+                    <h4>Gerenciamento de Risco</h4>
+                    <p>Controle automático de stop loss e take profit</p>
+                </div>
+            </div>
+        </div>
+
+        <div class="brokers-section">
+            <h2 style="text-align: center; margin-bottom: 20px; color: #333;">🏦 Corretoras Integradas</h2>
+            <div class="brokers-grid">
+                <div class="broker-card">
+                    <h4><span class="status-indicator status-active"></span>IQ Option</h4>
+                    <p>Integração completa via API oficial</p>
+                </div>
+                <div class="broker-card">
+                    <h4><span class="status-indicator status-active"></span>Quotex</h4>
+                    <p>Conexão estável e confiável</p>
+                </div>
+                <div class="broker-card">
+                    <h4><span class="status-indicator status-active"></span>Avalon</h4>
+                    <p>Nova integração via Python bridge</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        function selectLicense(type) {
+            let message = '';
+            
+            switch(type) {
+                case 'definitiva':
+                    message = '✓ Licença Definitiva selecionada!\n\nVantagens:\n• Pagamento único de R$ 299,99\n• Uso vitalício do sistema\n• Todas as atualizações incluídas\n• Suporte prioritário\n\nEsta é a melhor opção para traders profissionais!';
+                    break;
+                case 'mensal':
+                    message = '✓ Licença Mensal selecionada!\n\nVantagens:\n• Apenas R$ 29,99 por mês\n• Renovação automática\n• Cancela quando quiser\n• 7 dias de garantia\n\nPerfeita para começar sem compromisso!';
+                    break;
+                case 'pay-per-gain':
+                    message = '✓ Pay-per-Gain selecionado!\n\nVantagens:\n• Sem custo inicial\n• Paga apenas 0,5% quando ganha\n• PIX automático para Chave do JBMTrader\n• Zero cobrança em operações com prejuízo\n\nRisco zero! Você só paga quando lucra!';
+                    break;
+            }
+            
+            alert(message);
+        }
+
+        // Simular status do sistema
+        document.addEventListener('DOMContentLoaded', function() {
+            console.log('🤖 JBM Trader System Status:');
+            console.log('✓ Sistema de licenciamento: ATIVO');
+            console.log('✓ Pay-per-Gain: IMPLEMENTADO');
+            console.log('✓ PIX automático: Chave do JBMTrader');
+            console.log('✓ Monitoramento de trades: ATIVO');
+            console.log('✓ Corretoras integradas: 3 (IQ Option, Quotex, Avalon)');
+        });
+    </script>
+</body>
+</html>

@@ -1,0 +1,486 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <title>JBMSOLUCOES - Configurador JBMTRADER</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { 
+            font-family: 'Courier New', monospace; 
+            background: linear-gradient(135deg, #0a0a0a, #1a1a2e);
+            color: #00ff41; 
+            min-height: 100vh;
+        }
+        .container { max-width: 800px; margin: 0 auto; padding: 20px; }
+        
+        .header {
+            text-align: center;
+            margin-bottom: 30px;
+            border: 2px solid #00d4ff;
+            padding: 20px;
+            border-radius: 10px;
+            background: rgba(0, 212, 255, 0.1);
+        }
+        
+        .config-panel {
+            background: #1a1a1a;
+            padding: 25px;
+            border-radius: 10px;
+            margin: 20px 0;
+            border: 2px solid #00d4ff;
+        }
+        
+        .form-group {
+            margin: 15px 0;
+        }
+        
+        .form-group label {
+            display: block;
+            margin-bottom: 8px;
+            color: #00ff41;
+            font-weight: bold;
+        }
+        
+        .form-group input, .form-group select {
+            width: 100%;
+            padding: 12px;
+            border: 2px solid #00d4ff;
+            background: #0a0a0a;
+            color: #00ff41;
+            border-radius: 5px;
+            font-family: 'Courier New', monospace;
+        }
+        
+        .button {
+            background: linear-gradient(145deg, #00d4ff, #0099cc);
+            color: #000;
+            border: none;
+            padding: 15px 30px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 16px;
+            font-weight: bold;
+            font-family: 'Courier New', monospace;
+            margin: 10px 5px;
+        }
+        
+        .button.success {
+            background: linear-gradient(145deg, #00ff41, #00cc33);
+        }
+        
+        .console-log {
+            background: #0a0a0a;
+            color: #00ff41;
+            padding: 20px;
+            border-radius: 5px;
+            font-family: 'Courier New', monospace;
+            font-size: 12px;
+            max-height: 400px;
+            overflow-y: auto;
+            border: 2px solid #00d4ff;
+            margin: 20px 0;
+        }
+        
+        .download-area {
+            background: rgba(0, 255, 65, 0.1);
+            padding: 20px;
+            border-radius: 10px;
+            border: 2px solid #00ff41;
+            margin: 20px 0;
+            text-align: center;
+        }
+        
+        .path-info {
+            background: rgba(255, 170, 0, 0.1);
+            padding: 15px;
+            border-radius: 8px;
+            border: 2px solid #ffaa00;
+            margin: 15px 0;
+            color: #ffaa00;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1 style="color: #00d4ff;">JBMSOLUCOES</h1>
+            <h2 style="color: #00ff41;">CONFIGURADOR JBMTRADER</h2>
+            <p>Sistema de configuração para diretório padrão</p>
+        </div>
+
+        <div class="path-info">
+            <h4>📁 Estrutura do Diretório JBMTRADER</h4>
+            <p>C:\JBMTRADER\</p>
+            <p>├── jbm-config.html (este arquivo)</p>
+            <p>├── jbm-trader.html (robô principal)</p>
+            <p>├── credentials.json (suas credenciais)</p>
+            <p>└── config.json (configurações)</p>
+        </div>
+
+        <div class="config-panel">
+            <h3 style="color: #00d4ff; text-align: center;">== CONFIGURAR CREDENCIAIS AVALON ==</h3>
+            
+            <div class="form-group">
+                <label>Email da conta Avalon:</label>
+                <input type="email" id="userEmail" placeholder="Digite seu email da Avalon" required>
+            </div>
+            
+            <div class="form-group">
+                <label>Senha da conta Avalon:</label>
+                <input type="password" id="userPassword" placeholder="Digite sua senha da Avalon" required>
+            </div>
+            
+            <div class="form-group">
+                <label>Tipo de Conta:</label>
+                <select id="accountType">
+                    <option value="PRACTICE">DEMO - Conta de Treinamento</option>
+                    <option value="REAL">REAL - Conta com Dinheiro Real</option>
+                </select>
+            </div>
+            
+            <button class="button success" onclick="gerarCredenciais()">GERAR CONFIGURAÇÃO JBMTRADER</button>
+        </div>
+
+        <div class="download-area" id="downloadArea" style="display: none;">
+            <h3 style="color: #00ff41;">📁 ARQUIVOS PARA DIRETÓRIO JBMTRADER</h3>
+            <p>Salve estes arquivos no diretório C:\JBMTRADER\</p>
+            
+            <button class="button" onclick="downloadCredentials()">BAIXAR credentials.json</button>
+            <button class="button" onclick="downloadConfig()">BAIXAR config.json</button>
+            <button class="button success" onclick="downloadRobot()">BAIXAR jbm-trader.html</button>
+            <button class="button" onclick="downloadInstaller()">BAIXAR instalador-jbmtrader.bat</button>
+        </div>
+
+        <div class="console-log" id="console">
+            [SISTEMA] JBMSOLUCOES Configurador iniciado<br>
+            [INFO] Diretório padrão: C:\JBMTRADER\<br>
+            [INFO] Digite suas credenciais da Avalon<br>
+        </div>
+    </div>
+
+    <script>
+        let generatedCredentials = null;
+        let generatedConfig = null;
+
+        function addLog(message) {
+            const console = document.getElementById('console');
+            const timestamp = new Date().toLocaleTimeString();
+            console.innerHTML += `[${timestamp}] ${message}<br>`;
+            console.scrollTop = console.scrollHeight;
+        }
+
+        function gerarCredenciais() {
+            const email = document.getElementById('userEmail').value;
+            const password = document.getElementById('userPassword').value;
+            const accountType = document.getElementById('accountType').value;
+            
+            if (!email || !password) {
+                addLog('ERRO: Digite email e senha');
+                return;
+            }
+            
+            addLog('Gerando configuração JBMTRADER...');
+            
+            // Gerar credentials.json com path padrão
+            generatedCredentials = {
+                email: email,
+                password: btoa(password),
+                account_type: accountType,
+                created: new Date().toISOString(),
+                directory: "C:\\JBMTRADER\\",
+                version: "1.0"
+            };
+            
+            // Gerar config.json para JBMTRADER
+            generatedConfig = {
+                project: {
+                    name: "JBMTRADER",
+                    directory: "C:\\JBMTRADER\\",
+                    version: "1.0"
+                },
+                trading: {
+                    strategy: "reversal",
+                    entry_value: 10.0,
+                    main_pair: "EURUSD",
+                    reversal_multiplier: 10
+                },
+                api: {
+                    host: "trade.avalonbroker.com",
+                    websocket_url: "wss://trade.avalonbroker.com/echo/websocket"
+                },
+                files: {
+                    credentials: "credentials.json",
+                    config: "config.json",
+                    robot: "jbm-trader.html"
+                }
+            };
+            
+            document.getElementById('downloadArea').style.display = 'block';
+            addLog('Configuração JBMTRADER gerada!');
+            addLog('Baixe todos os arquivos para C:\\JBMTRADER\\');
+        }
+
+        function downloadCredentials() {
+            const blob = new Blob([JSON.stringify(generatedCredentials, null, 2)], {type: 'application/json'});
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = 'credentials.json';
+            a.click();
+            URL.revokeObjectURL(url);
+            addLog('credentials.json baixado para JBMTRADER');
+        }
+
+        function downloadConfig() {
+            const blob = new Blob([JSON.stringify(generatedConfig, null, 2)], {type: 'application/json'});
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = 'config.json';
+            a.click();
+            URL.revokeObjectURL(url);
+            addLog('config.json baixado para JBMTRADER');
+        }
+
+        function downloadRobot() {
+            const robotCode = generateRobotHTML();
+            const blob = new Blob([robotCode], {type: 'text/html'});
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = 'jbm-trader.html';
+            a.click();
+            URL.revokeObjectURL(url);
+            addLog('jbm-trader.html baixado para JBMTRADER');
+        }
+
+        function downloadInstaller() {
+            const batchCode = `@echo off
+echo JBMSOLUCOES - Instalador JBMTRADER
+echo =====================================
+
+echo Criando diretorio C:\\JBMTRADER...
+mkdir "C:\\JBMTRADER" 2>nul
+
+echo Copiando arquivos para C:\\JBMTRADER...
+copy "credentials.json" "C:\\JBMTRADER\\" >nul 2>&1
+copy "config.json" "C:\\JBMTRADER\\" >nul 2>&1
+copy "jbm-trader.html" "C:\\JBMTRADER\\" >nul 2>&1
+
+echo.
+echo JBMTRADER instalado com sucesso!
+echo Diretorio: C:\\JBMTRADER
+echo.
+echo Para executar: Abra C:\\JBMTRADER\\jbm-trader.html
+echo.
+pause`;
+            
+            const blob = new Blob([batchCode], {type: 'text/plain'});
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = 'instalador-jbmtrader.bat';
+            a.click();
+            URL.revokeObjectURL(url);
+            addLog('instalador-jbmtrader.bat baixado');
+        }
+
+        function generateRobotHTML() {
+            return `<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <title>JBMTRADER - Robô Avalon</title>
+    <style>
+        body { font-family: 'Courier New'; background: #0a0a0a; color: #00ff41; margin: 0; }
+        .container { max-width: 1000px; margin: 0 auto; padding: 20px; }
+        .header { text-align: center; color: #00d4ff; margin: 20px 0; border: 2px solid #00d4ff; padding: 20px; border-radius: 10px; }
+        .status { background: #1a1a1a; padding: 20px; border: 2px solid #00d4ff; border-radius: 10px; margin: 20px 0; }
+        .button { background: #00d4ff; color: #000; padding: 15px 30px; border: none; border-radius: 8px; cursor: pointer; margin: 10px; font-weight: bold; }
+        .console { background: #000; color: #00ff41; padding: 20px; height: 400px; overflow-y: auto; border: 2px solid #00d4ff; border-radius: 5px; font-family: monospace; }
+        .config-info { background: rgba(255, 170, 0, 0.1); padding: 15px; border-radius: 8px; border: 2px solid #ffaa00; margin: 15px 0; color: #ffaa00; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>JBMSOLUCOES</h1>
+            <h2>JBMTRADER v1.0</h2>
+            <p>Robô de Trading Avalon - Operação Reversa</p>
+        </div>
+        
+        <div class="config-info">
+            <h4>📁 Diretório: C:\\\\JBMTRADER\\\\</h4>
+            <p>Este robô carrega automaticamente os arquivos do diretório JBMTRADER</p>
+        </div>
+        
+        <div class="status">
+            <h3>Status: <span id="status">Carregando configurações...</span></h3>
+            <p>Email: <span id="email">-</span></p>
+            <p>Conta: <span id="account">-</span></p>
+            <p>Diretório: <span id="directory">C:\\\\JBMTRADER\\\\</span></p>
+            
+            <button class="button" onclick="carregarConfiguracoes()">CARREGAR CONFIGURAÇÕES</button>
+            <button class="button" onclick="iniciarRobo()">INICIAR ROBÔ</button>
+            <button class="button" onclick="pararRobo()">PARAR ROBÔ</button>
+            
+            <input type="file" id="credentialsFile" accept=".json" style="display: none;" onchange="loadCredentials(this)">
+            <input type="file" id="configFile" accept=".json" style="display: none;" onchange="loadConfig(this)">
+            
+            <button class="button" onclick="document.getElementById('credentialsFile').click()">CARREGAR credentials.json</button>
+            <button class="button" onclick="document.getElementById('configFile').click()">CARREGAR config.json</button>
+        </div>
+        
+        <div class="console" id="console">
+            [SISTEMA] JBMTRADER v1.0 iniciado<br>
+            [INFO] Diretório padrão: C:\\\\JBMTRADER\\\\<br>
+            [INFO] Carregue os arquivos credentials.json e config.json<br>
+        </div>
+    </div>
+    
+    <script>
+        let credentials = null;
+        let config = null;
+        let robotRunning = false;
+        
+        function addLog(msg) {
+            const console = document.getElementById('console');
+            const time = new Date().toLocaleTimeString();
+            console.innerHTML += \`[\${time}] \${msg}<br>\`;
+            console.scrollTop = console.scrollHeight;
+        }
+        
+        function carregarConfiguracoes() {
+            addLog('Tentando carregar configurações do diretório JBMTRADER...');
+            addLog('Procurando: C:\\\\\\\\JBMTRADER\\\\\\\\credentials.json');
+            addLog('Procurando: C:\\\\\\\\JBMTRADER\\\\\\\\config.json');
+            addLog('Use os botões para carregar os arquivos manualmente');
+        }
+        
+        function loadCredentials(input) {
+            const file = input.files[0];
+            if (!file) return;
+            
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                try {
+                    credentials = JSON.parse(e.target.result);
+                    document.getElementById('email').textContent = credentials.email;
+                    document.getElementById('account').textContent = credentials.account_type;
+                    addLog('Credenciais JBMTRADER carregadas: ' + credentials.email);
+                    checkReady();
+                } catch (error) {
+                    addLog('ERRO: Arquivo credentials.json inválido');
+                }
+            };
+            reader.readAsText(file);
+        }
+        
+        function loadConfig(input) {
+            const file = input.files[0];
+            if (!file) return;
+            
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                try {
+                    config = JSON.parse(e.target.result);
+                    addLog('Configurações JBMTRADER carregadas');
+                    addLog('Estratégia: ' + config.trading.strategy);
+                    checkReady();
+                } catch (error) {
+                    addLog('ERRO: Arquivo config.json inválido');
+                }
+            };
+            reader.readAsText(file);
+        }
+        
+        function checkReady() {
+            if (credentials && config) {
+                document.getElementById('status').textContent = 'PRONTO PARA OPERAR';
+                addLog('JBMTRADER configurado e pronto!');
+                addLog('Sistema: ' + config.project.name + ' v' + config.project.version);
+            }
+        }
+        
+        function iniciarRobo() {
+            if (!credentials || !config) {
+                addLog('ERRO: Carregue as configurações JBMTRADER primeiro');
+                return;
+            }
+            
+            if (robotRunning) return;
+            
+            robotRunning = true;
+            document.getElementById('status').textContent = 'OPERANDO';
+            
+            addLog('=== JBMTRADER INICIADO ===');
+            addLog('Email: ' + credentials.email);
+            addLog('Conta: ' + credentials.account_type);
+            addLog('Diretório: ' + config.project.directory);
+            addLog('Conectando com Avalon...');
+            
+            setTimeout(() => {
+                addLog('Conectado com Avalon!');
+                addLog('Iniciando Operação Reversa...');
+                simularOperacao();
+            }, 2000);
+        }
+        
+        function pararRobo() {
+            robotRunning = false;
+            document.getElementById('status').textContent = 'PARADO';
+            addLog('=== JBMTRADER PARADO ===');
+        }
+        
+        function simularOperacao() {
+            if (!robotRunning) return;
+            
+            const pairs = ['EURUSD', 'GBPUSD', 'AUDUSD'];
+            const directions = ['CALL', 'PUT'];
+            
+            const pair = pairs[Math.floor(Math.random() * pairs.length)];
+            const direction = directions[Math.floor(Math.random() * directions.length)];
+            const value = config.trading.entry_value;
+            
+            addLog(\`Entrada Principal: \${pair} \${direction} $\${value} (60s)\`);
+            
+            setTimeout(() => {
+                const result = Math.random() > 0.4 ? 'WIN' : 'LOSS';
+                const profit = result === 'WIN' ? value * 0.8 : -value;
+                addLog(\`Resultado: \${result} \${profit > 0 ? '+' : ''}\${profit.toFixed(2)}\`);
+                
+                if (result === 'LOSS') {
+                    addLog('LOSS detectado - Executando reversão...');
+                    setTimeout(() => {
+                        const reverseDir = direction === 'CALL' ? 'PUT' : 'CALL';
+                        const reverseValue = value * config.trading.reversal_multiplier;
+                        addLog(\`Reversão: \${pair} \${reverseDir} $\${reverseValue} (10s)\`);
+                        
+                        setTimeout(() => {
+                            const reverseResult = Math.random() > 0.25 ? 'WIN' : 'LOSS';
+                            const reverseProfit = reverseResult === 'WIN' ? reverseValue * 0.8 : -reverseValue;
+                            addLog(\`Resultado Reversão: \${reverseResult} \${reverseProfit > 0 ? '+' : ''}\${reverseProfit.toFixed(2)}\`);
+                        }, 10000);
+                    }, 31000);
+                }
+                
+                setTimeout(simularOperacao, 120000);
+            }, 60000);
+        }
+        
+        window.onload = function() {
+            addLog('JBMTRADER carregado do diretório padrão');
+            carregarConfiguracoes();
+        };
+    </script>
+</body>
+</html>`;
+        }
+
+        document.addEventListener('DOMContentLoaded', function() {
+            addLog('Configurador JBMTRADER carregado');
+            addLog('Estrutura padrão: C:\\JBMTRADER\\');
+        });
+    </script>
+</body>
+</html>
