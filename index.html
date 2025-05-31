@@ -3,132 +3,557 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>JBM Trader - Sistema de Trading Automatizado</title>
-    <link rel="icon" type="image/svg+xml" href="/vite.svg" />
+    <title>JBM Trader v2.2 - Sistema de Trading Binário</title>
     <style>
-        body {
+        * {
             margin: 0;
             padding: 0;
-            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', sans-serif;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #1a1a2e, #16213e, #0f3460);
+            color: white;
             min-height: 100vh;
+        }
+        
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+        
+        .header {
+            text-align: center;
+            padding: 30px 0;
+            border-bottom: 2px solid #00d4ff;
+            margin-bottom: 30px;
+        }
+        
+        .header h1 {
+            font-size: 2.5em;
+            color: #00d4ff;
+            margin-bottom: 10px;
+        }
+        
+        .header p {
+            font-size: 1.2em;
+            opacity: 0.8;
+        }
+        
+        .dashboard {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+        
+        .card {
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 10px;
+            padding: 20px;
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+        
+        .card h3 {
+            color: #00d4ff;
+            margin-bottom: 15px;
+            font-size: 1.3em;
+        }
+        
+        .status {
             display: flex;
             align-items: center;
-            justify-content: center;
-        }
-        .container {
-            background: white;
-            border-radius: 12px;
-            padding: 40px;
-            text-align: center;
-            box-shadow: 0 20px 40px rgba(0,0,0,0.1);
-            max-width: 500px;
-            width: 90%;
-        }
-        .logo {
-            font-size: 2.5rem;
-            font-weight: bold;
-            color: #667eea;
-            margin-bottom: 20px;
-        }
-        .subtitle {
-            color: #666;
-            margin-bottom: 30px;
-            font-size: 1.1rem;
-        }
-        .features {
-            text-align: left;
-            margin: 30px 0;
-        }
-        .feature {
             margin: 10px 0;
-            padding: 10px;
-            background: #f8f9fa;
-            border-radius: 6px;
-            border-left: 4px solid #667eea;
         }
+        
+        .status-dot {
+            width: 10px;
+            height: 10px;
+            border-radius: 50%;
+            margin-right: 10px;
+        }
+        
+        .status-dot.active {
+            background: #00ff88;
+            box-shadow: 0 0 10px #00ff88;
+        }
+        
+        .status-dot.inactive {
+            background: #ff4444;
+            box-shadow: 0 0 10px #ff4444;
+        }
+        
         .btn {
-            background: #667eea;
-            color: white;
+            background: linear-gradient(45deg, #00d4ff, #0099cc);
             border: none;
-            padding: 15px 30px;
-            border-radius: 8px;
-            font-size: 1.1rem;
-            cursor: pointer;
-            text-decoration: none;
-            display: inline-block;
-            margin: 10px;
-            transition: all 0.3s ease;
-        }
-        .btn:hover {
-            background: #5a6fd8;
-            transform: translateY(-2px);
-        }
-        .status {
-            margin-top: 20px;
-            padding: 10px;
+            padding: 12px 24px;
             border-radius: 6px;
-            background: #e8f5e8;
-            color: #2d5f2d;
-            font-weight: bold;
+            color: white;
+            cursor: pointer;
+            font-size: 1em;
+            transition: all 0.3s;
+            margin: 5px;
+        }
+        
+        .btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(0, 212, 255, 0.4);
+        }
+        
+        .btn:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+        
+        .trading-panel {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+            margin-top: 20px;
+        }
+        
+        .input-group {
+            margin: 10px 0;
+        }
+        
+        .input-group label {
+            display: block;
+            margin-bottom: 5px;
+            color: #00d4ff;
+        }
+        
+        .input-group input, .input-group select {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid rgba(255, 255, 255, 0.3);
+            border-radius: 5px;
+            background: rgba(255, 255, 255, 0.1);
+            color: white;
+            font-size: 1em;
+        }
+        
+        .input-group input::placeholder {
+            color: rgba(255, 255, 255, 0.5);
+        }
+        
+        .logs {
+            background: rgba(0, 0, 0, 0.5);
+            padding: 20px;
+            border-radius: 10px;
+            margin-top: 20px;
+            height: 200px;
+            overflow-y: auto;
+            font-family: 'Courier New', monospace;
+            font-size: 0.9em;
+        }
+        
+        .log-entry {
+            margin: 5px 0;
+            padding: 5px 0;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        }
+        
+        .log-success {
+            color: #00ff88;
+        }
+        
+        .log-error {
+            color: #ff4444;
+        }
+        
+        .log-info {
+            color: #00d4ff;
+        }
+        
+        @media (max-width: 768px) {
+            .trading-panel {
+                grid-template-columns: 1fr;
+            }
+            
+            .dashboard {
+                grid-template-columns: 1fr;
+            }
         }
     </style>
 </head>
 <body>
     <div class="container">
-        <div class="logo">JBM TRADER</div>
-        <div class="subtitle">Sistema Profissional de Trading Automatizado</div>
+        <div class="header">
+            <div style="display: flex; align-items: center; justify-content: center; gap: 20px; margin-bottom: 15px;">
+                <svg width="80" height="80" viewBox="0 0 200 200" xmlns="http://www.w3.org/2000/svg">
+                  <defs>
+                    <linearGradient id="bgGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+                      <stop offset="0%" style="stop-color:#667eea;stop-opacity:1" />
+                      <stop offset="100%" style="stop-color:#764ba2;stop-opacity:1" />
+                    </linearGradient>
+                    <linearGradient id="chartGradient" x1="0%" y1="0%" x2="100%" y2="0%">
+                      <stop offset="0%" style="stop-color:#28a745;stop-opacity:1" />
+                      <stop offset="100%" style="stop-color:#20c997;stop-opacity:1" />
+                    </linearGradient>
+                    <filter id="shadow" x="-20%" y="-20%" width="140%" height="140%">
+                      <feDropShadow dx="2" dy="4" stdDeviation="3" flood-color="#000" flood-opacity="0.3"/>
+                    </filter>
+                  </defs>
+                  
+                  <!-- Background Circle -->
+                  <circle cx="100" cy="100" r="90" fill="url(#bgGradient)" filter="url(#shadow)"/>
+                  
+                  <!-- Inner Circle -->
+                  <circle cx="100" cy="100" r="75" fill="none" stroke="rgba(255,255,255,0.2)" stroke-width="2"/>
+                  
+                  <!-- Chart Bars -->
+                  <rect x="40" y="120" width="8" height="40" fill="url(#chartGradient)" rx="2"/>
+                  <rect x="55" y="110" width="8" height="50" fill="url(#chartGradient)" rx="2"/>
+                  <rect x="70" y="100" width="8" height="60" fill="url(#chartGradient)" rx="2"/>
+                  <rect x="85" y="85" width="8" height="75" fill="url(#chartGradient)" rx="2"/>
+                  <rect x="100" y="70" width="8" height="90" fill="url(#chartGradient)" rx="2"/>
+                  <rect x="115" y="80" width="8" height="80" fill="url(#chartGradient)" rx="2"/>
+                  <rect x="130" y="95" width="8" height="65" fill="url(#chartGradient)" rx="2"/>
+                  <rect x="145" y="105" width="8" height="55" fill="url(#chartGradient)" rx="2"/>
+                  
+                  <!-- Trend Line -->
+                  <path d="M 40 130 Q 70 110 100 75 Q 130 85 160 110" stroke="#FFD700" stroke-width="3" fill="none" stroke-linecap="round"/>
+                  
+                  <!-- Currency Symbol -->
+                  <circle cx="100" cy="50" r="12" fill="rgba(255,255,255,0.9)"/>
+                  <text x="100" y="57" text-anchor="middle" font-family="Arial, sans-serif" font-size="14" font-weight="bold" fill="#667eea">$</text>
+                  
+                  <!-- Bot/Automation Icon -->
+                  <g transform="translate(140, 40)">
+                    <rect x="0" y="0" width="20" height="15" rx="3" fill="rgba(255,255,255,0.9)"/>
+                    <circle cx="6" cy="6" r="2" fill="#667eea"/>
+                    <circle cx="14" cy="6" r="2" fill="#667eea"/>
+                    <rect x="7" y="10" width="6" height="2" rx="1" fill="#667eea"/>
+                  </g>
+                  
+                  <!-- Decorative Elements -->
+                  <circle cx="60" cy="60" r="3" fill="rgba(255,255,255,0.6)"/>
+                  <circle cx="150" cy="70" r="2" fill="rgba(255,255,255,0.4)"/>
+                  <circle cx="45" cy="80" r="2" fill="rgba(255,255,255,0.5)"/>
+                  
+                  <!-- Arrow indicating growth -->
+                  <path d="M 150 120 L 160 115 L 155 125 Z" fill="#FFD700"/>
+                </svg>
+                <h1>JBM Trader v2.2</h1>
+            </div>
+            <p>Sistema Avançado de Trading Binário</p>
+        </div>
         
-        <div class="features">
-            <div class="feature">
-                <strong>3 Brokers Integrados:</strong> IQ Option, Quotex, Avalon
+        <div class="dashboard">
+            <div class="card">
+                <h3>Status das Conexões</h3>
+                <div class="status" id="alpha-status">
+                    <div class="status-dot inactive"></div>
+                    <span>Alpha Vantage API</span>
+                </div>
+                <div class="status" id="twelve-status">
+                    <div class="status-dot inactive"></div>
+                    <span>Twelve Data API</span>
+                </div>
+                <div class="status" id="stripe-status">
+                    <div class="status-dot inactive"></div>
+                    <span>Stripe Payment</span>
+                </div>
+                <div class="status" id="avalon-status">
+                    <div class="status-dot inactive"></div>
+                    <span>Avalon Trading</span>
+                </div>
+                <button class="btn" onclick="checkConnections()">Verificar Conexões</button>
             </div>
-            <div class="feature">
-                <strong>Análise Técnica Avançada:</strong> Médias móveis, RSI, MACD
+            
+            <div class="card">
+                <h3>Dados de Mercado</h3>
+                <div class="input-group">
+                    <label>Símbolo:</label>
+                    <input type="text" id="symbol" value="EURUSD" placeholder="Ex: EURUSD, GBPUSD">
+                </div>
+                <button class="btn" onclick="fetchMarketData()">Buscar Dados</button>
+                <div id="market-data" style="margin-top: 15px; font-size: 0.9em;"></div>
             </div>
-            <div class="feature">
-                <strong>Trading Automatizado:</strong> Estratégias programadas
-            </div>
-            <div class="feature">
-                <strong>Gestão de Risco:</strong> Stop loss e take profit automáticos
-            </div>
-            <div class="feature">
-                <strong>Interface Moderna:</strong> Dashboard em tempo real
+            
+            <div class="card">
+                <h3>Avalon Trading</h3>
+                <div class="input-group">
+                    <label>Email:</label>
+                    <input type="email" id="avalon-email" value="jbm5688@hotmail.com">
+                </div>
+                <div class="input-group">
+                    <label>Senha:</label>
+                    <input type="password" id="avalon-password" value="Odecamocsob@5688">
+                </div>
+                <button class="btn" onclick="avalonLogin()">Conectar Avalon</button>
             </div>
         </div>
-
-        <a href="/app" class="btn">Iniciar Trading</a>
-        <a href="/config" class="btn">Configurações</a>
         
-        <div class="status" id="status">
-            Sistema Carregando...
+        <div class="trading-panel">
+            <div class="card">
+                <h3>Painel de Trading</h3>
+                <div class="input-group">
+                    <label>Ativo:</label>
+                    <select id="trade-asset">
+                        <option value="EURUSD">EUR/USD</option>
+                        <option value="GBPUSD">GBP/USD</option>
+                        <option value="USDJPY">USD/JPY</option>
+                        <option value="AUDUSD">AUD/USD</option>
+                    </select>
+                </div>
+                <div class="input-group">
+                    <label>Valor (USD):</label>
+                    <input type="number" id="trade-amount" value="10" min="1" max="1000">
+                </div>
+                <div class="input-group">
+                    <label>Direção:</label>
+                    <select id="trade-direction">
+                        <option value="call">CALL (Subir)</option>
+                        <option value="put">PUT (Descer)</option>
+                    </select>
+                </div>
+                <div class="input-group">
+                    <label>Expiração (minutos):</label>
+                    <input type="number" id="trade-expiry" value="1" min="1" max="60">
+                </div>
+                <button class="btn" onclick="executeTrade()" id="trade-btn" disabled>Executar Trade</button>
+            </div>
+            
+            <div class="card">
+                <h3>Stripe Payment Test</h3>
+                <div class="input-group">
+                    <label>Valor (USD):</label>
+                    <input type="number" id="payment-amount" value="100" min="1">
+                </div>
+                <button class="btn" onclick="createPayment()">Criar Pagamento</button>
+                <div id="payment-result" style="margin-top: 15px;"></div>
+            </div>
+        </div>
+        
+        <div class="logs" id="logs">
+            <div class="log-entry log-info">Sistema inicializado - Aguardando verificação de conexões...</div>
+        </div>
+        
+        <div class="card" style="margin-top: 20px; max-width: 400px;">
+            <h3>Sistema</h3>
+            <div id="system-info">
+                <p>Versão: 2.2.0</p>
+                <p>Status: <span id="server-status">Verificando...</span></p>
+                <p>Uptime: <span id="uptime">-</span></p>
+            </div>
+            <button class="btn" onclick="checkHealth()">Verificar Sistema</button>
         </div>
     </div>
-
+    
     <script>
-        // Verificar status do servidor
-        fetch('/api/health')
-            .then(response => {
+        // Variáveis globais
+        let systemHealth = {};
+        let connections = {};
+        
+        // Função para adicionar logs
+        function addLog(message, type = 'info') {
+            const logs = document.getElementById('logs');
+            const timestamp = new Date().toLocaleTimeString();
+            const logEntry = document.createElement('div');
+            logEntry.className = `log-entry log-${type}`;
+            logEntry.innerHTML = `[${timestamp}] ${message}`;
+            logs.appendChild(logEntry);
+            logs.scrollTop = logs.scrollHeight;
+        }
+        
+        // Verificar saúde do sistema
+        async function checkHealth() {
+            try {
+                const response = await fetch('/api/health');
+                systemHealth = await response.json();
+                
+                document.getElementById('server-status').textContent = 'Online';
+                document.getElementById('uptime').textContent = Math.floor(systemHealth.uptime) + 's';
+                
+                addLog('Sistema funcionando normalmente', 'success');
+                checkConnections();
+            } catch (error) {
+                addLog('Erro ao verificar sistema: ' + error.message, 'error');
+            }
+        }
+        
+        // Verificar conexões das APIs
+        async function checkConnections() {
+            addLog('Verificando conexões das APIs...', 'info');
+            
+            // Verificar Alpha Vantage
+            try {
+                const response = await fetch('/api/market-data/alpha-vantage/EURUSD');
                 if (response.ok) {
-                    document.getElementById('status').innerHTML = '✅ Sistema Online e Funcionando';
-                    document.getElementById('status').style.background = '#e8f5e8';
+                    updateConnectionStatus('alpha-status', true);
+                    addLog('Alpha Vantage: Conectado', 'success');
                 } else {
-                    throw new Error('Servidor não respondeu');
+                    throw new Error('Falha na resposta');
                 }
-            })
-            .catch(() => {
-                document.getElementById('status').innerHTML = '⚠️ Iniciando servidor...';
-                document.getElementById('status').style.background = '#fff3cd';
-                // Redirecionar para a aplicação principal após alguns segundos
-                setTimeout(() => {
-                    window.location.href = '/app';
-                }, 3000);
-            });
-
-        // Auto-redirecionar para a aplicação após 5 segundos se estiver online
-        setTimeout(() => {
-            window.location.href = '/app';
-        }, 5000);
+            } catch (error) {
+                updateConnectionStatus('alpha-status', false);
+                addLog('Alpha Vantage: Erro de conexão', 'error');
+            }
+            
+            // Verificar Twelve Data
+            try {
+                const response = await fetch('/api/market-data/twelve-data/EURUSD');
+                if (response.ok) {
+                    updateConnectionStatus('twelve-status', true);
+                    addLog('Twelve Data: Conectado', 'success');
+                } else {
+                    throw new Error('Falha na resposta');
+                }
+            } catch (error) {
+                updateConnectionStatus('twelve-status', false);
+                addLog('Twelve Data: Erro de conexão', 'error');
+            }
+            
+            // Stripe sempre ativo (configurado no servidor)
+            updateConnectionStatus('stripe-status', true);
+            addLog('Stripe: Configurado', 'success');
+        }
+        
+        function updateConnectionStatus(elementId, isActive) {
+            const element = document.getElementById(elementId);
+            const dot = element.querySelector('.status-dot');
+            
+            if (isActive) {
+                dot.className = 'status-dot active';
+            } else {
+                dot.className = 'status-dot inactive';
+            }
+        }
+        
+        // Buscar dados de mercado
+        async function fetchMarketData() {
+            const symbol = document.getElementById('symbol').value;
+            const marketDataDiv = document.getElementById('market-data');
+            
+            addLog(`Buscando dados para ${symbol}...`, 'info');
+            marketDataDiv.innerHTML = 'Carregando...';
+            
+            try {
+                const response = await fetch(`/api/market-data/alpha-vantage/${symbol}`);
+                const data = await response.json();
+                
+                if (data['Time Series (1min)']) {
+                    const latestTime = Object.keys(data['Time Series (1min)'])[0];
+                    const latestData = data['Time Series (1min)'][latestTime];
+                    
+                    marketDataDiv.innerHTML = `
+                        <strong>${symbol}</strong><br>
+                        Preço: $${latestData['4. close']}<br>
+                        Hora: ${latestTime}<br>
+                        Volume: ${latestData['5. volume']}
+                    `;
+                    
+                    addLog(`Dados obtidos para ${symbol}`, 'success');
+                } else {
+                    throw new Error('Dados não encontrados');
+                }
+            } catch (error) {
+                marketDataDiv.innerHTML = 'Erro ao buscar dados';
+                addLog(`Erro ao buscar ${symbol}: ${error.message}`, 'error');
+            }
+        }
+        
+        // Login Avalon
+        async function avalonLogin() {
+            const email = document.getElementById('avalon-email').value;
+            const password = document.getElementById('avalon-password').value;
+            
+            addLog('Conectando ao Avalon...', 'info');
+            
+            try {
+                const response = await fetch('/api/avalon/login', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({ email, password })
+                });
+                
+                const result = await response.json();
+                
+                if (response.ok) {
+                    updateConnectionStatus('avalon-status', true);
+                    document.getElementById('trade-btn').disabled = false;
+                    addLog('Avalon: Login realizado com sucesso', 'success');
+                } else {
+                    throw new Error(result.error);
+                }
+            } catch (error) {
+                updateConnectionStatus('avalon-status', false);
+                addLog(`Avalon: Erro de login - ${error.message}`, 'error');
+            }
+        }
+        
+        // Executar trade
+        async function executeTrade() {
+            const asset = document.getElementById('trade-asset').value;
+            const amount = document.getElementById('trade-amount').value;
+            const direction = document.getElementById('trade-direction').value;
+            const expiry = document.getElementById('trade-expiry').value;
+            
+            addLog(`Executando trade: ${asset} ${direction} $${amount}`, 'info');
+            
+            try {
+                const response = await fetch('/api/avalon/trade', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({ asset, amount, direction, expiry })
+                });
+                
+                const result = await response.json();
+                
+                if (response.ok) {
+                    const resultColor = result.result === 'win' ? 'success' : 'error';
+                    addLog(`Trade #${result.tradeId}: ${result.result.toUpperCase()}`, resultColor);
+                } else {
+                    throw new Error(result.error);
+                }
+            } catch (error) {
+                addLog(`Erro no trade: ${error.message}`, 'error');
+            }
+        }
+        
+        // Criar pagamento Stripe
+        async function createPayment() {
+            const amount = document.getElementById('payment-amount').value;
+            const resultDiv = document.getElementById('payment-result');
+            
+            addLog(`Criando pagamento de $${amount}...`, 'info');
+            
+            try {
+                const response = await fetch('/api/create-payment-intent', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({ amount: parseFloat(amount) })
+                });
+                
+                const result = await response.json();
+                
+                if (response.ok) {
+                    resultDiv.innerHTML = `<span style="color: #00ff88;">Payment Intent criado com sucesso!</span><br>Client Secret: ${result.clientSecret.substring(0, 20)}...`;
+                    addLog('Stripe: Payment Intent criado', 'success');
+                } else {
+                    throw new Error(result.error);
+                }
+            } catch (error) {
+                resultDiv.innerHTML = `<span style="color: #ff4444;">Erro: ${error.message}</span>`;
+                addLog(`Stripe: Erro - ${error.message}`, 'error');
+            }
+        }
+        
+        // Inicializar sistema
+        window.onload = function() {
+            addLog('JBM Trader v2.2 carregado', 'success');
+            checkHealth();
+        };
     </script>
 </body>
 </html>
