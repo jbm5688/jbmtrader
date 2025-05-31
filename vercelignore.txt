@@ -1,0 +1,11 @@
+server/
+client/
+api/
+electron/
+shared/
+node_modules/
+*.js
+*.ts
+*.json
+!index.html
+!vercel.json
