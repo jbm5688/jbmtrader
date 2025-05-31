@@ -1,28 +1,4 @@
 {
-  "version": 2,
-  "name": "jbm-trader",
-  "builds": [
-    {
-      "src": "api/index.js",
-      "use": "@vercel/node"
-    }
-  ],
-  "routes": [
-    {
-      "src": "/api/(.*)",
-      "dest": "/api/index.js"
-    },
-    {
-      "src": "/(.*)",
-      "dest": "/api/index.js"
-    }
-  ],
-  "env": {
-    "NODE_ENV": "production",
-    "ALPHA_VANTAGE_API_KEY": "@alpha_vantage_api_key",
-    "TWELVE_DATA_API_KEY": "@twelve_data_api_key",
-    "AVALON_EMAIL": "@avalon_email",
-    "AVALON_PASSWORD": "@avalon_password",
-    "SESSION_SECRET": "@session_secret"
-  }
+  "cleanUrls": true,
+  "trailingSlash": false
 }
